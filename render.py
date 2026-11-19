@@ -13,6 +13,8 @@ ROOT = Path(__file__).resolve().parent
 def render(mode, size, data):
     colors = theme(mode)
     ranked = sorted(data["rows"], key=lambda row: (_strength(row["rank"]), -row["score"]))
+    if size == "mini":
+        return _mini(mode, colors, data, ranked[0])
     if size == "compact":
         return _compact(mode, colors, data, ranked[0])
     if size == "wide":
@@ -25,6 +27,18 @@ def _strength(rank):
         return LADDER.index(rank)
     except ValueError:
         return len(LADDER)
+
+
+def _mini(mode, colors, data, best):
+    name, _ = dots("TROPHIES", 28, 12, colors["fg"], scale=1.15)
+    return "\n".join([
+        open_svg(mode, 220, 148, f"{data['login']} trophies", mark=6, margin=14),
+        name,
+        label(16, 96, best["rank"], colors["figure"], 32, -0.8),
+        label(16, 118, best["title"], colors["fg"], 13, 0.1),
+        label(16, 136, f"{best['score']:,}", colors["muted"], 12, 0.2),
+        "</svg>",
+    ])
 
 
 def _compact(mode, colors, data, best):
@@ -69,6 +83,18 @@ def _wide(mode, colors, data):
     return "\n".join(parts)
 
 
+def _variant(card, login, mode, size, filename):
+    url = f"https://github.com/itsrealkaran/{card}?username={login}&theme={mode}&size={size}"
+    return [
+        f"**{card}** · {mode} · {size}",
+        "",
+        f"`{url}`",
+        "",
+        f"![{card} {mode} {size}](dist/{login}/{filename})",
+        "",
+    ]
+
+
 def main():
     login = sys.argv[1] if len(sys.argv) > 1 else "itsrealkaran"
     data = trophies(login)
@@ -85,7 +111,7 @@ def main():
         for size in SIZES:
             filename = f"{mode}-{size}.svg"
             (out / filename).write_text(render(mode, size, data))
-            lines += [f"### {size}", "", f"![{mode} {size}](dist/{data['login']}/{filename})", ""]
+            lines += _variant("trophies", data["login"], mode, size, filename)
             print(data["login"], mode, size)
     (ROOT / "DUMMY.md").write_text("\n".join(lines) + "\n")
 
