@@ -4,113 +4,209 @@ Compact is the best rank. Regular is the top three. Wide is the six-rank row.
 
 ## classic
 
-### compact
+**trophies** · classic · mini
 
-![classic compact](dist/itsrealkaran/classic-compact.svg)
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=classic&size=mini`
 
-### regular
+![trophies classic mini](dist/itsrealkaran/classic-mini.svg)
 
-![classic regular](dist/itsrealkaran/classic-regular.svg)
+**trophies** · classic · compact
 
-### wide
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=classic&size=compact`
 
-![classic wide](dist/itsrealkaran/classic-wide.svg)
+![trophies classic compact](dist/itsrealkaran/classic-compact.svg)
+
+**trophies** · classic · regular
+
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=classic&size=regular`
+
+![trophies classic regular](dist/itsrealkaran/classic-regular.svg)
+
+**trophies** · classic · wide
+
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=classic&size=wide`
+
+![trophies classic wide](dist/itsrealkaran/classic-wide.svg)
 
 ## classic-r
 
-### compact
+**trophies** · classic-r · mini
 
-![classic-r compact](dist/itsrealkaran/classic-r-compact.svg)
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=classic-r&size=mini`
 
-### regular
+![trophies classic-r mini](dist/itsrealkaran/classic-r-mini.svg)
 
-![classic-r regular](dist/itsrealkaran/classic-r-regular.svg)
+**trophies** · classic-r · compact
 
-### wide
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=classic-r&size=compact`
 
-![classic-r wide](dist/itsrealkaran/classic-r-wide.svg)
+![trophies classic-r compact](dist/itsrealkaran/classic-r-compact.svg)
+
+**trophies** · classic-r · regular
+
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=classic-r&size=regular`
+
+![trophies classic-r regular](dist/itsrealkaran/classic-r-regular.svg)
+
+**trophies** · classic-r · wide
+
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=classic-r&size=wide`
+
+![trophies classic-r wide](dist/itsrealkaran/classic-r-wide.svg)
 
 ## white
 
-### compact
+**trophies** · white · mini
 
-![white compact](dist/itsrealkaran/white-compact.svg)
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=white&size=mini`
 
-### regular
+![trophies white mini](dist/itsrealkaran/white-mini.svg)
 
-![white regular](dist/itsrealkaran/white-regular.svg)
+**trophies** · white · compact
 
-### wide
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=white&size=compact`
 
-![white wide](dist/itsrealkaran/white-wide.svg)
+![trophies white compact](dist/itsrealkaran/white-compact.svg)
+
+**trophies** · white · regular
+
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=white&size=regular`
+
+![trophies white regular](dist/itsrealkaran/white-regular.svg)
+
+**trophies** · white · wide
+
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=white&size=wide`
+
+![trophies white wide](dist/itsrealkaran/white-wide.svg)
 
 ## white-r
 
-### compact
+**trophies** · white-r · mini
 
-![white-r compact](dist/itsrealkaran/white-r-compact.svg)
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=white-r&size=mini`
 
-### regular
+![trophies white-r mini](dist/itsrealkaran/white-r-mini.svg)
 
-![white-r regular](dist/itsrealkaran/white-r-regular.svg)
+**trophies** · white-r · compact
 
-### wide
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=white-r&size=compact`
 
-![white-r wide](dist/itsrealkaran/white-r-wide.svg)
+![trophies white-r compact](dist/itsrealkaran/white-r-compact.svg)
+
+**trophies** · white-r · regular
+
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=white-r&size=regular`
+
+![trophies white-r regular](dist/itsrealkaran/white-r-regular.svg)
+
+**trophies** · white-r · wide
+
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=white-r&size=wide`
+
+![trophies white-r wide](dist/itsrealkaran/white-r-wide.svg)
 
 ## light
 
-### compact
+**trophies** · light · mini
 
-![light compact](dist/itsrealkaran/light-compact.svg)
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=light&size=mini`
 
-### regular
+![trophies light mini](dist/itsrealkaran/light-mini.svg)
 
-![light regular](dist/itsrealkaran/light-regular.svg)
+**trophies** · light · compact
 
-### wide
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=light&size=compact`
 
-![light wide](dist/itsrealkaran/light-wide.svg)
+![trophies light compact](dist/itsrealkaran/light-compact.svg)
+
+**trophies** · light · regular
+
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=light&size=regular`
+
+![trophies light regular](dist/itsrealkaran/light-regular.svg)
+
+**trophies** · light · wide
+
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=light&size=wide`
+
+![trophies light wide](dist/itsrealkaran/light-wide.svg)
 
 ## red
 
-### compact
+**trophies** · red · mini
 
-![red compact](dist/itsrealkaran/red-compact.svg)
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=red&size=mini`
 
-### regular
+![trophies red mini](dist/itsrealkaran/red-mini.svg)
 
-![red regular](dist/itsrealkaran/red-regular.svg)
+**trophies** · red · compact
 
-### wide
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=red&size=compact`
 
-![red wide](dist/itsrealkaran/red-wide.svg)
+![trophies red compact](dist/itsrealkaran/red-compact.svg)
+
+**trophies** · red · regular
+
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=red&size=regular`
+
+![trophies red regular](dist/itsrealkaran/red-regular.svg)
+
+**trophies** · red · wide
+
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=red&size=wide`
+
+![trophies red wide](dist/itsrealkaran/red-wide.svg)
 
 ## blue
 
-### compact
+**trophies** · blue · mini
 
-![blue compact](dist/itsrealkaran/blue-compact.svg)
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=blue&size=mini`
 
-### regular
+![trophies blue mini](dist/itsrealkaran/blue-mini.svg)
 
-![blue regular](dist/itsrealkaran/blue-regular.svg)
+**trophies** · blue · compact
 
-### wide
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=blue&size=compact`
 
-![blue wide](dist/itsrealkaran/blue-wide.svg)
+![trophies blue compact](dist/itsrealkaran/blue-compact.svg)
+
+**trophies** · blue · regular
+
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=blue&size=regular`
+
+![trophies blue regular](dist/itsrealkaran/blue-regular.svg)
+
+**trophies** · blue · wide
+
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=blue&size=wide`
+
+![trophies blue wide](dist/itsrealkaran/blue-wide.svg)
 
 ## yellow
 
-### compact
+**trophies** · yellow · mini
 
-![yellow compact](dist/itsrealkaran/yellow-compact.svg)
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=yellow&size=mini`
 
-### regular
+![trophies yellow mini](dist/itsrealkaran/yellow-mini.svg)
 
-![yellow regular](dist/itsrealkaran/yellow-regular.svg)
+**trophies** · yellow · compact
 
-### wide
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=yellow&size=compact`
 
-![yellow wide](dist/itsrealkaran/yellow-wide.svg)
+![trophies yellow compact](dist/itsrealkaran/yellow-compact.svg)
+
+**trophies** · yellow · regular
+
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=yellow&size=regular`
+
+![trophies yellow regular](dist/itsrealkaran/yellow-regular.svg)
+
+**trophies** · yellow · wide
+
+`https://github.com/itsrealkaran/trophies?username=itsrealkaran&theme=yellow&size=wide`
+
+![trophies yellow wide](dist/itsrealkaran/yellow-wide.svg)
 
