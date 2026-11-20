@@ -9,12 +9,14 @@ const { fixed, py, xml } = require("./format");
 const RANKS = new Set(["SSS", "SS", "S", "AAA", "AA", "A", "B", "C"]);
 const SHOULDER = 5;
 
-function trophy(x, y, scale, rank, colors) {
+function trophy(x, y, scale, rank, colors, tip = null) {
   const text = RANKS.has(rank) ? rank : "";
   const letter = text.slice(0, 1);
   const count = text.length;
   const step = scale + 1.1;
   const frame = text ? colors.fg : colors.muted;
+  // A reversed theme keeps the letters in the cup color and paints only the tip.
+  const ink = tip ? colors.fg : colors.mark;
   const parts = [];
   const dot = (originX, originY, col, row, size, fill) => {
     const stride = size + 1.1;
@@ -26,11 +28,11 @@ function trophy(x, y, scale, rank, colors) {
   };
   let letterCol = 3;
   let handle = 10;
-  if (count < 2) plainCup(dot, x, y, scale, frame, Boolean(text));
-  else [letterCol, handle] = crownCup(dot, x, y, scale, frame, Boolean(text), count);
+  if (count < 2) plainCup(dot, x, y, scale, frame, Boolean(text), tip);
+  else [letterCol, handle] = crownCup(dot, x, y, scale, frame, Boolean(text), count, tip);
   if (letter) {
-    glyph(dot, x, y, letterCol, 3, scale, GLYPHS[letter], colors.mark);
-    if (count >= 2) sideLetters(dot, x, y, scale, step, count, letter, colors.mark);
+    glyph(dot, x, y, letterCol, 3, scale, GLYPHS[letter], ink);
+    if (count >= 2) sideLetters(dot, x, y, scale, step, count, letter, ink);
   }
   return [parts.join(""), handle * step + scale, 12 * step + scale];
 }
@@ -43,8 +45,8 @@ function glyph(dot, x, y, col, row, size, grid, fill) {
   });
 }
 
-function plainCup(dot, x, y, scale, frame, peaked) {
-  if (peaked) dot(x, y, 5, 0, scale, frame);
+function plainCup(dot, x, y, scale, frame, peaked, tip = null) {
+  if (peaked) dot(x, y, 5, 0, scale, tip || frame);
   for (let col = 2; col < 9; col += 1) dot(x, y, col, 1, scale, frame);
   for (let row = 2; row < 10; row += 1) {
     dot(x, y, 1, row, scale, frame);
@@ -59,14 +61,14 @@ function plainCup(dot, x, y, scale, frame, peaked) {
   for (let col = 2; col < 9; col += 1) dot(x, y, col, 12, scale, frame);
 }
 
-function crownCup(dot, x, y, scale, frame, peaked, count) {
+function crownCup(dot, x, y, scale, frame, peaked, count, tip = null) {
   const left = count >= 3 ? SHOULDER : 0;
   const raisedLeft = 1 + left;
   const raisedRight = raisedLeft + 8;
   const outerRight = raisedRight + SHOULDER;
   const outerLeft = 1;
   const stem = Math.floor((raisedLeft + raisedRight) / 2);
-  if (peaked) dot(x, y, stem, 0, scale, frame);
+  if (peaked) dot(x, y, stem, 0, scale, tip || frame);
   for (let col = raisedLeft + 1; col < raisedRight; col += 1) dot(x, y, col, 1, scale, frame);
   for (let row = 2; row < 5; row += 1) {
     dot(x, y, raisedLeft, row, scale, frame);

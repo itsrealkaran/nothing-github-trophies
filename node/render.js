@@ -24,8 +24,12 @@ function rankScale(size) {
   return { mini: 2.8, compact: 3.2, regular: 2.6, wide: 2.7 }[size];
 }
 
-function cup(x, y, scale, row, colors) {
-  return trophy(x, y, scale, row.rank, colors);
+function tipColor(mode, colors) {
+  return mode.endsWith("-r") ? colors.mark : null;
+}
+
+function cup(x, y, scale, row, colors, tip = null) {
+  return trophy(x, y, scale, row.rank, colors, tip);
 }
 
 function mini(mode, colors, data, best) {
@@ -33,7 +37,7 @@ function mini(mode, colors, data, best) {
   return [
     openSvg(mode, 220, 148, data.login + " trophies", 6, 14),
     name,
-    cup(16, 46, rankScale("mini"), best, colors)[0],
+    cup(16, 46, rankScale("mini"), best, colors, tipColor(mode, colors))[0],
     label(100, 86, best.title, colors.fg, 14, 0.1),
     label(100, 108, commas(best.score), colors.muted, 12, 0.2),
     "</svg>",
@@ -45,7 +49,7 @@ function compact(mode, colors, data, best) {
   return [
     openSvg(mode, 495, 132, data.login + " trophies"),
     name,
-    cup(20, 44, rankScale("compact"), best, colors)[0],
+    cup(20, 44, rankScale("compact"), best, colors, tipColor(mode, colors))[0],
     label(120, 86, best.title, colors.fg, 16, 0.2),
     label(120, 110, commas(best.score), colors.muted, 13, 0.2),
     "</svg>",
@@ -61,7 +65,7 @@ function regular(mode, colors, data, rows) {
     const x = 20 + index * 155;
     const scale = rankScale("regular");
     const measured = trophy(0, 0, scale, row.rank, colors);
-    parts.push(cup(x + (130 - measured[1]) / 2, bottom - measured[2], scale, row, colors)[0]);
+    parts.push(cup(x + (130 - measured[1]) / 2, bottom - measured[2], scale, row, colors, tipColor(mode, colors))[0]);
     parts.push(label(x, 122, row.title, colors.fg, 13, 0.2));
     parts.push(label(x, 142, commas(row.score), colors.muted, 12, 0.2));
   });
@@ -81,7 +85,7 @@ function wide(mode, colors, data) {
     const scale = rankScale("wide");
     const measured = trophy(0, 0, scale, row.rank, colors);
     parts.push(`<rect x="${x}" y="72" width="134" height="156" fill="none" stroke="${colors.rule}"/>`);
-    parts.push(cup(x + (134 - measured[1]) / 2, bottom - measured[2], scale, row, colors)[0]);
+    parts.push(cup(x + (134 - measured[1]) / 2, bottom - measured[2], scale, row, colors, tipColor(mode, colors))[0]);
     parts.push(label(x + 12, 168, row.title, colors.fg, 13, 0.2));
     parts.push(label(x + 12, 190, commas(row.score), colors.muted, 12, 0.2));
   });

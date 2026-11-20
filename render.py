@@ -33,8 +33,12 @@ def _scale(size):
     return {"mini": 2.8, "compact": 3.2, "regular": 2.6, "wide": 2.7}[size]
 
 
-def _cup(x, y, scale, row, colors):
-    mark, width, _height = trophy(x, y, scale, row["rank"], colors)
+def _tip(mode, colors):
+    return colors["mark"] if mode.endswith("-r") else None
+
+
+def _cup(x, y, scale, row, colors, tip=None):
+    mark, width, _height = trophy(x, y, scale, row["rank"], colors, tip)
     return mark, width
 
 
@@ -43,7 +47,7 @@ def _mini(mode, colors, data, best):
     return "\n".join([
         open_svg(mode, 220, 148, f"{data['login']} trophies", mark=6, margin=14),
         name,
-        _cup(16, 46, _scale("mini"), best, colors)[0],
+        _cup(16, 46, _scale("mini"), best, colors, _tip(mode, colors))[0],
         label(100, 86, best["title"], colors["fg"], 14, 0.1),
         label(100, 108, f"{best['score']:,}", colors["muted"], 12, 0.2),
         "</svg>",
@@ -55,7 +59,7 @@ def _compact(mode, colors, data, best):
     return "\n".join([
         open_svg(mode, 495, 132, f"{data['login']} trophies"),
         name,
-        _cup(20, 44, _scale("compact"), best, colors)[0],
+        _cup(20, 44, _scale("compact"), best, colors, _tip(mode, colors))[0],
         label(120, 86, best["title"], colors["fg"], 16, 0.2),
         label(120, 110, f"{best['score']:,}", colors["muted"], 13, 0.2),
         "</svg>",
@@ -71,7 +75,7 @@ def _regular(mode, colors, data, rows):
         x = 20 + index * 155
         scale = _scale("regular")
         _mark, width, height = trophy(0, 0, scale, row["rank"], colors)
-        parts.append(_cup(x + (130 - width) / 2, bottom - height, scale, row, colors)[0])
+        parts.append(_cup(x + (130 - width) / 2, bottom - height, scale, row, colors, _tip(mode, colors))[0])
         parts.append(label(x, 122, row["title"], colors["fg"], 13, 0.2))
         parts.append(label(x, 142, f"{row['score']:,}", colors["muted"], 12, 0.2))
     parts.append(f'<line x1="20" y1="160" x2="475" y2="160" stroke="{colors["rule"]}"/>')
@@ -92,7 +96,7 @@ def _wide(mode, colors, data):
         parts.append(
             f'<rect x="{x}" y="72" width="134" height="156" fill="none" stroke="{colors["rule"]}"/>'
         )
-        parts.append(_cup(x + (134 - width) / 2, bottom - height, scale, row, colors)[0])
+        parts.append(_cup(x + (134 - width) / 2, bottom - height, scale, row, colors, _tip(mode, colors))[0])
         parts.append(label(x + 12, 168, row["title"], colors["fg"], 13, 0.2))
         parts.append(label(x + 12, 190, f"{row['score']:,}", colors["muted"], 12, 0.2))
     parts.append("</svg>")
