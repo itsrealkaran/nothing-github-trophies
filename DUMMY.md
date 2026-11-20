@@ -1,6 +1,6 @@
 # itsrealkaran
 
-Compact is the best rank. Regular is the top three. Wide is the six-rank row. The grade is drawn in the trophy.
+Compact is the best rank. Regular is the top three. Wide is the six-rank row.
 
 ## classic
 

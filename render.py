@@ -29,18 +29,8 @@ def _strength(rank):
         return len(LADDER)
 
 
-def _letters(rank):
-    return len(rank) if rank in ("SSS", "SS", "S", "AAA", "AA", "A", "B", "C") else 1
-
-
-def _scale(size, rank):
-    table = {
-        "mini": (2.8, 2.3, 1.9),
-        "compact": (3.2, 2.6, 2.2),
-        "regular": (2.6, 2.2, 1.8),
-        "wide": (2.7, 2.2, 1.8),
-    }
-    return table[size][_letters(rank) - 1]
+def _scale(size):
+    return {"mini": 2.8, "compact": 3.2, "regular": 2.6, "wide": 2.7}[size]
 
 
 def _cup(x, y, scale, row, colors):
@@ -53,7 +43,7 @@ def _mini(mode, colors, data, best):
     return "\n".join([
         open_svg(mode, 220, 148, f"{data['login']} trophies", mark=6, margin=14),
         name,
-        _cup(16, 46, _scale("mini", best["rank"]), best, colors)[0],
+        _cup(16, 46, _scale("mini"), best, colors)[0],
         label(100, 86, best["title"], colors["fg"], 14, 0.1),
         label(100, 108, f"{best['score']:,}", colors["muted"], 12, 0.2),
         "</svg>",
@@ -65,7 +55,7 @@ def _compact(mode, colors, data, best):
     return "\n".join([
         open_svg(mode, 495, 132, f"{data['login']} trophies"),
         name,
-        _cup(20, 44, _scale("compact", best["rank"]), best, colors)[0],
+        _cup(20, 44, _scale("compact"), best, colors)[0],
         label(120, 86, best["title"], colors["fg"], 16, 0.2),
         label(120, 110, f"{best['score']:,}", colors["muted"], 13, 0.2),
         "</svg>",
@@ -75,11 +65,11 @@ def _compact(mode, colors, data, best):
 def _regular(mode, colors, data, rows):
     name, _ = dots("TROPHIES", 40, 16, colors["fg"], scale=1.8)
     parts = [open_svg(mode, 495, 192, f"{data['login']} trophies"), name]
-    _mark, _width, tall = trophy(0, 0, _scale("regular", "A"), "A", colors)
+    _mark, _width, tall = trophy(0, 0, _scale("regular"), "A", colors)
     bottom = 48 + tall
     for index, row in enumerate(rows):
         x = 20 + index * 155
-        scale = _scale("regular", row["rank"])
+        scale = _scale("regular")
         _mark, width, height = trophy(0, 0, scale, row["rank"], colors)
         parts.append(_cup(x + (130 - width) / 2, bottom - height, scale, row, colors)[0])
         parts.append(label(x, 122, row["title"], colors["fg"], 13, 0.2))
@@ -93,11 +83,11 @@ def _regular(mode, colors, data, rows):
 def _wide(mode, colors, data):
     name, _ = dots("TROPHIES", 40, 16, colors["fg"], scale=1.8)
     parts = [open_svg(mode, 896, 248, f"{data['login']} trophies"), name]
-    _mark, _width, tall = trophy(0, 0, _scale("wide", "A"), "A", colors)
+    _mark, _width, tall = trophy(0, 0, _scale("wide"), "A", colors)
     bottom = 84 + tall
     for index, row in enumerate(data["rows"]):
         x = 20 + index * 146
-        scale = _scale("wide", row["rank"])
+        scale = _scale("wide")
         _mark, width, height = trophy(0, 0, scale, row["rank"], colors)
         parts.append(
             f'<rect x="{x}" y="72" width="134" height="156" fill="none" stroke="{colors["rule"]}"/>'
@@ -129,7 +119,7 @@ def main():
     lines = [
         f"# {data['login']}",
         "",
-        "Compact is the best rank. Regular is the top three. Wide is the six-rank row. The grade is drawn in the trophy.",
+        "Compact is the best rank. Regular is the top three. Wide is the six-rank row.",
         "",
     ]
     for mode in MODES:
