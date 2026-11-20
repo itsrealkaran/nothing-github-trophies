@@ -3,10 +3,11 @@
 const { GLYPHS, theme } = require("./nothing");
 const { fixed, py, xml } = require("./format");
 
-// The center letter stays the single-letter size. Extra letters are smaller
-// and sit inside the cup, on the right for a double grade and on both sides
-// for a triple grade.
+// The center letter stays the single-letter size. Extra letters are smaller,
+// share its baseline, and sit in a lower shoulder. The rim rises over the
+// tall letter and steps down over the short ones, like a crown.
 const RANKS = new Set(["SSS", "SS", "S", "AAA", "AA", "A", "B", "C"]);
+const SHOULDER = 5;
 
 function trophy(x, y, scale, rank, colors) {
   const text = RANKS.has(rank) ? rank : "";
@@ -23,70 +24,93 @@ function trophy(x, y, scale, rank, colors) {
       `<circle cx="${fixed(cx, 1)}" cy="${fixed(cy, 1)}" r="${fixed(size / 2, 2)}" fill="${fill}"/>`
     );
   };
-  const extraLeft = count >= 3 ? 4 : 0;
-  const extraRight = count >= 2 ? 4 : 0;
-  const leftWall = 1;
-  const rightWall = 9 + extraLeft + extraRight;
-  const stem = Math.floor((leftWall + rightWall) / 2);
-  const letterCol = stem - 2;
-  const handle = rightWall + 1;
-  if (text) dot(x, y, stem, 0, scale, frame);
-  for (let col = leftWall + 1; col < rightWall; col += 1) dot(x, y, col, 1, scale, frame);
-  for (let row = 2; row < 10; row += 1) {
-    dot(x, y, leftWall, row, scale, frame);
-    dot(x, y, rightWall, row, scale, frame);
-  }
-  for (const row of [4, 5, 6]) {
-    dot(x, y, 0, row, scale, frame);
-    dot(x, y, handle, row, scale, frame);
-  }
-  dot(x, y, stem, 10, scale, frame);
-  for (let col = leftWall + 2; col < rightWall - 1; col += 1) dot(x, y, col, 11, scale, frame);
-  for (let col = leftWall + 1; col < rightWall; col += 1) dot(x, y, col, 12, scale, frame);
+  let letterCol = 3;
+  let handle = 10;
+  if (count < 2) plainCup(dot, x, y, scale, frame, Boolean(text));
+  else [letterCol, handle] = crownCup(dot, x, y, scale, frame, Boolean(text), count);
   if (letter) {
-    GLYPHS[letter].forEach((bits, row) => {
-      for (let col = 0; col < bits.length; col += 1) {
-        if (bits[col] === "1") dot(x, y, letterCol + col, row + 3, scale, colors.mark);
-      }
-    });
-    sideLetters(dot, x, y, scale, step, count, letter, colors.mark, leftWall, rightWall, letterCol);
+    glyph(dot, x, y, letterCol, 3, scale, GLYPHS[letter], colors.mark);
+    if (count >= 2) sideLetters(dot, x, y, scale, step, count, letter, colors.mark);
   }
   return [parts.join(""), handle * step + scale, 12 * step + scale];
 }
 
-function sideLetters(dot, x, y, scale, step, count, letter, fill, leftWall, rightWall, letterCol) {
-  if (count < 2) return;
-  const glyphW = 4 * step + scale;
-  const glyphH = 6 * step + scale;
-  const letterLeft = letterCol * step;
-  const letterRight = letterLeft + glyphW;
-  const innerLeft = leftWall * step + scale;
-  const innerRight = rightWall * step;
-  const pad = 1.5;
-  const gaps = [];
-  if (count >= 3) gaps.push(letterLeft - innerLeft);
-  if (count >= 2) gaps.push(innerRight - letterRight);
-  const room = Math.min(...gaps) - pad * 2;
-  const side = Math.min(scale * 0.32, (room - 4.4) / 5);
-  if (side < 0.75) return;
-  const sideStep = side + 1.1;
-  const sideW = 4 * sideStep + side;
-  const sideH = 6 * sideStep + side;
-  const mid = 3 * step + glyphH / 2;
-  const sideY = y + mid - sideH / 2;
-  const paint = (originX) => {
-    GLYPHS[letter].forEach((bits, row) => {
-      for (let col = 0; col < bits.length; col += 1) {
-        if (bits[col] === "1") dot(originX, sideY, col, row, side, fill);
-      }
-    });
-  };
-  if (count >= 3) {
-    paint(x + innerLeft + pad + (letterLeft - innerLeft - pad * 2 - sideW) / 2);
+function glyph(dot, x, y, col, row, size, grid, fill) {
+  grid.forEach((bits, gridRow) => {
+    for (let gridCol = 0; gridCol < bits.length; gridCol += 1) {
+      if (bits[gridCol] === "1") dot(x, y, col + gridCol, row + gridRow, size, fill);
+    }
+  });
+}
+
+function plainCup(dot, x, y, scale, frame, peaked) {
+  if (peaked) dot(x, y, 5, 0, scale, frame);
+  for (let col = 2; col < 9; col += 1) dot(x, y, col, 1, scale, frame);
+  for (let row = 2; row < 10; row += 1) {
+    dot(x, y, 1, row, scale, frame);
+    dot(x, y, 9, row, scale, frame);
   }
-  if (count >= 2) {
-    paint(x + letterRight + pad + (innerRight - letterRight - pad * 2 - sideW) / 2);
+  for (const row of [4, 5, 6]) {
+    dot(x, y, 0, row, scale, frame);
+    dot(x, y, 10, row, scale, frame);
   }
+  for (let col = 1; col < 10; col += 1) dot(x, y, col, 10, scale, frame);
+  for (let col = 3; col < 8; col += 1) dot(x, y, col, 11, scale, frame);
+  for (let col = 2; col < 9; col += 1) dot(x, y, col, 12, scale, frame);
+}
+
+function crownCup(dot, x, y, scale, frame, peaked, count) {
+  const left = count >= 3 ? SHOULDER : 0;
+  const raisedLeft = 1 + left;
+  const raisedRight = raisedLeft + 8;
+  const outerRight = raisedRight + SHOULDER;
+  const outerLeft = 1;
+  const stem = Math.floor((raisedLeft + raisedRight) / 2);
+  if (peaked) dot(x, y, stem, 0, scale, frame);
+  for (let col = raisedLeft + 1; col < raisedRight; col += 1) dot(x, y, col, 1, scale, frame);
+  for (let row = 2; row < 5; row += 1) {
+    dot(x, y, raisedLeft, row, scale, frame);
+    dot(x, y, raisedRight, row, scale, frame);
+  }
+  if (left) {
+    for (let col = outerLeft + 1; col < raisedLeft; col += 1) dot(x, y, col, 4, scale, frame);
+    dot(x, y, outerLeft, 4, scale, frame);
+  }
+  for (let col = raisedRight + 1; col < outerRight; col += 1) dot(x, y, col, 4, scale, frame);
+  dot(x, y, outerRight, 4, scale, frame);
+  for (let row = 5; row < 10; row += 1) {
+    dot(x, y, left ? outerLeft : raisedLeft, row, scale, frame);
+    dot(x, y, outerRight, row, scale, frame);
+  }
+  for (const row of left ? [6, 7, 8] : [4, 5, 6]) dot(x, y, 0, row, scale, frame);
+  for (const row of [6, 7, 8]) dot(x, y, outerRight + 1, row, scale, frame);
+  const wall = left ? outerLeft : raisedLeft;
+  for (let col = wall; col <= outerRight; col += 1) dot(x, y, col, 10, scale, frame);
+  for (let col = stem - 2; col < stem + 3; col += 1) dot(x, y, col, 11, scale, frame);
+  for (let col = stem - 3; col < stem + 4; col += 1) dot(x, y, col, 12, scale, frame);
+  return [raisedLeft + 2, outerRight + 1];
+}
+
+function sideLetters(dot, x, y, scale, step, count, letter, fill) {
+  const left = count >= 3 ? SHOULDER : 0;
+  const raisedLeft = 1 + left;
+  const raisedRight = raisedLeft + 8;
+  const outerRight = raisedRight + SHOULDER;
+  const bottom = 9 * step + scale;
+  const maxH = bottom - (5 * step + 1.2);
+  let side = Math.min(scale * 0.55, (maxH - 6.6) / 7);
+  const shoulders = [];
+  if (left) shoulders.push([1 * step + scale, raisedLeft * step]);
+  shoulders.push([raisedRight * step + scale, outerRight * step]);
+  const gap = Math.min(...shoulders.map(([leftEdge, right]) => right - leftEdge));
+  side = Math.min(side, (gap - 3.2 - 4.4) / 5);
+  if (side < 0.7) return;
+  const sideH = 6 * (side + 1.1) + side;
+  const sideW = 4 * (side + 1.1) + side;
+  const sideY = y + bottom - sideH;
+  shoulders.forEach(([leftEdge, right]) => {
+    glyph(dot, x + leftEdge + (right - leftEdge - sideW) / 2, sideY, 0, 0, side, GLYPHS[letter], fill);
+  });
 }
 
 function dots(text, x, y, fill, scale = 2.4) {
