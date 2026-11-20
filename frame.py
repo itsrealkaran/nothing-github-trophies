@@ -5,48 +5,96 @@ from datetime import datetime, timedelta, timezone
 from nothing import GLYPHS, theme
 
 
-# The rank is the bowl: one letter, or the whole token when the grade is longer.
+# The center letter stays the single-letter size. Extra letters are smaller
+# and sit inside the cup, on the right for a double grade and on both sides
+# for a triple grade.
 RANKS = ("SSS", "SS", "S", "AAA", "AA", "A", "B", "C")
 
 
 def trophy(x, y, scale, rank, colors):
     text = rank if rank in RANKS else ""
-    count = len(text) or 1
-    cols = 6 + count * 5 + (count - 1)
-    center = (cols - 1) // 2
-    right_wall = cols - 2
-    right_handle = cols - 1
+    letter = text[:1]
+    count = len(text)
     step = scale + 1.1
     frame = colors["fg"] if text else colors["muted"]
     parts = []
 
-    def dot(col, row, fill):
-        cx = x + col * step + scale / 2
-        cy = y + row * step + scale / 2
-        parts.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{scale / 2:.2f}" fill="{fill}"/>')
+    def dot(origin_x, origin_y, col, row, size, fill):
+        stride = size + 1.1
+        cx = origin_x + col * stride + size / 2
+        cy = origin_y + row * stride + size / 2
+        parts.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{size / 2:.2f}" fill="{fill}"/>')
+
+    extra_left = 4 if count >= 3 else 0
+    extra_right = 4 if count >= 2 else 0
+    left_wall = 1
+    right_wall = 9 + extra_left + extra_right
+    stem = (left_wall + right_wall) // 2
+    letter_col = stem - 2
+    handle = right_wall + 1
 
     if text:
-        dot(center, 0, frame)
-    for col in range(2, right_wall):
-        dot(col, 1, frame)
+        dot(x, y, stem, 0, scale, frame)
+    for col in range(left_wall + 1, right_wall):
+        dot(x, y, col, 1, scale, frame)
     for row in range(2, 10):
-        dot(1, row, frame)
-        dot(right_wall, row, frame)
+        dot(x, y, left_wall, row, scale, frame)
+        dot(x, y, right_wall, row, scale, frame)
     for row in (4, 5, 6):
-        dot(0, row, frame)
-        dot(right_handle, row, frame)
-    dot(center, 10, frame)
-    for col in range(center - 2, center + 3):
-        dot(col, 11, frame)
-    for col in range(center - 3, center + 4):
-        dot(col, 12, frame)
-    for index, char in enumerate(text):
-        origin = 3 + index * 6
-        for row, bits in enumerate(GLYPHS[char]):
+        dot(x, y, 0, row, scale, frame)
+        dot(x, y, handle, row, scale, frame)
+    dot(x, y, stem, 10, scale, frame)
+    for col in range(left_wall + 2, right_wall - 1):
+        dot(x, y, col, 11, scale, frame)
+    for col in range(left_wall + 1, right_wall):
+        dot(x, y, col, 12, scale, frame)
+    if letter:
+        for row, bits in enumerate(GLYPHS[letter]):
             for col, bit in enumerate(bits):
                 if bit == "1":
-                    dot(origin + col, row + 3, colors["mark"])
-    return "".join(parts), (cols - 1) * step + scale, 12 * step + scale
+                    dot(x, y, letter_col + col, row + 3, scale, colors["mark"])
+        _side_letters(
+            dot, x, y, scale, step, count, letter, colors["mark"],
+            left_wall, right_wall, letter_col,
+        )
+    return "".join(parts), handle * step + scale, 12 * step + scale
+
+
+def _side_letters(dot, x, y, scale, step, count, letter, fill, left_wall, right_wall, letter_col):
+    if count < 2:
+        return
+    glyph_w = 4 * step + scale
+    glyph_h = 6 * step + scale
+    letter_left = letter_col * step
+    letter_right = letter_left + glyph_w
+    inner_left = left_wall * step + scale
+    inner_right = right_wall * step
+    pad = 1.5
+    gaps = []
+    if count >= 3:
+        gaps.append(letter_left - inner_left)
+    if count >= 2:
+        gaps.append(inner_right - letter_right)
+    room = min(gaps) - pad * 2
+    side = min(scale * 0.32, (room - 4.4) / 5)
+    if side < 0.75:
+        return
+    side_step = side + 1.1
+    side_w = 4 * side_step + side
+    side_h = 6 * side_step + side
+    mid = 3 * step + glyph_h / 2
+    side_y = y + mid - side_h / 2
+
+    def paint(origin_x):
+        for row, bits in enumerate(GLYPHS[letter]):
+            for col, bit in enumerate(bits):
+                if bit == "1":
+                    dot(origin_x, side_y, col, row, side, fill)
+
+    if count >= 3:
+        paint(x + inner_left + pad + (letter_left - inner_left - pad * 2 - side_w) / 2)
+    if count >= 2:
+        paint(x + letter_right + pad + (inner_right - letter_right - pad * 2 - side_w) / 2)
 
 
 def dots(text, x, y, fill, scale=2.4):
