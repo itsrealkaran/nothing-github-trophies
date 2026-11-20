@@ -2,7 +2,18 @@
 
 Six ranks: stars, contributions, followers, issues, pull requests, and public repositories.
 
-The ladder is C, B, A, AA, AAA, S, SS, SSS. Below 1 the rank is a dash. The plates are flat squares.
+The grades are the GitHub Profile Trophy scale: C, B, A, AA, AAA, S, SS, SSS. A score below 1 leaves an empty frame. Contributions use that scale's commit cutoffs. The plates are flat squares.
+
+| Rank | Stars | Contributions | Followers | Issues | Pulls | Repos |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| SSS | 2000 | 4000 | 1000 | 1000 | 1000 | 50 |
+| SS | 700 | 2000 | 400 | 500 | 500 | 45 |
+| S | 200 | 1000 | 200 | 200 | 200 | 40 |
+| AAA | 100 | 500 | 100 | 100 | 100 | 35 |
+| AA | 50 | 200 | 50 | 50 | 50 | 30 |
+| A | 30 | 100 | 20 | 20 | 20 | 20 |
+| B | 10 | 10 | 10 | 10 | 10 | 10 |
+| C | 1 | 1 | 1 | 1 | 1 | 1 |
 
 An SVG for a GitHub profile. Place the URL in a README, on a site, or anywhere an image is allowed.
 
@@ -45,7 +56,7 @@ Leave `theme` and `size` off for the classic regular card. An unknown username, 
 | `blue` | Pure White `#FFFFFF` | N-Blue `#002F6C` |
 | `yellow` | Pure Black `#000000` | N-Yellow `#FFC700` |
 
-The title is a dot grid. Labels are monospace.
+The title is a dot grid. The grade is the lettering inside the trophy, drawn in the accent, and a longer grade widens the cup. The category and the score stay in monospace.
 
 ## Sizes
 

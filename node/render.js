@@ -1,6 +1,6 @@
 "use strict";
 
-const { dots, label, openSvg } = require("./frame");
+const { dots, label, openSvg, trophy } = require("./frame");
 const { theme } = require("./nothing");
 const { commas } = require("./format");
 
@@ -20,14 +20,32 @@ function strength(rank) {
   return index === -1 ? LADDER.length : index;
 }
 
+function letters(rank) {
+  return ["SSS", "SS", "S", "AAA", "AA", "A", "B", "C"].includes(rank) ? rank.length : 1;
+}
+
+function rankScale(size, rank) {
+  const table = {
+    mini: [2.8, 2.3, 1.9],
+    compact: [3.2, 2.6, 2.2],
+    regular: [2.6, 2.2, 1.8],
+    wide: [2.7, 2.2, 1.8],
+  };
+  return table[size][letters(rank) - 1];
+}
+
+function cup(x, y, scale, row, colors) {
+  return trophy(x, y, scale, row.rank, colors);
+}
+
 function mini(mode, colors, data, best) {
   const [name] = dots("TROPHIES", 28, 12, colors.fg, 1.15);
   return [
     openSvg(mode, 220, 148, data.login + " trophies", 6, 14),
     name,
-    label(16, 96, best.rank, colors.figure, 32, -0.8),
-    label(16, 118, best.title, colors.fg, 13, 0.1),
-    label(16, 136, commas(best.score), colors.muted, 12, 0.2),
+    cup(16, 46, rankScale("mini", best.rank), best, colors)[0],
+    label(100, 86, best.title, colors.fg, 14, 0.1),
+    label(100, 108, commas(best.score), colors.muted, 12, 0.2),
     "</svg>",
   ].join("\n");
 }
@@ -37,24 +55,28 @@ function compact(mode, colors, data, best) {
   return [
     openSvg(mode, 495, 132, data.login + " trophies"),
     name,
-    label(20, 108, best.rank, colors.figure, 42, -1),
-    label(160, 90, best.title, colors.fg, 16, 0.2),
-    label(160, 112, commas(best.score), colors.muted, 13, 0.2),
+    cup(20, 44, rankScale("compact", best.rank), best, colors)[0],
+    label(120, 86, best.title, colors.fg, 16, 0.2),
+    label(120, 110, commas(best.score), colors.muted, 13, 0.2),
     "</svg>",
   ].join("\n");
 }
 
 function regular(mode, colors, data, rows) {
   const [name] = dots("TROPHIES", 40, 16, colors.fg, 1.8);
-  const parts = [openSvg(mode, 495, 195, data.login + " trophies"), name];
+  const parts = [openSvg(mode, 495, 192, data.login + " trophies"), name];
+  const tall = trophy(0, 0, rankScale("regular", "A"), "A", colors)[2];
+  const bottom = 48 + tall;
   rows.forEach((row, index) => {
     const x = 20 + index * 155;
-    parts.push(label(x, 112, row.rank, colors.figure, 32, -0.8));
-    parts.push(label(x, 138, row.title, colors.fg, 13, 0.2));
-    parts.push(label(x, 156, commas(row.score), colors.muted, 12, 0.2));
+    const scale = rankScale("regular", row.rank);
+    const measured = trophy(0, 0, scale, row.rank, colors);
+    parts.push(cup(x + (130 - measured[1]) / 2, bottom - measured[2], scale, row, colors)[0]);
+    parts.push(label(x, 122, row.title, colors.fg, 13, 0.2));
+    parts.push(label(x, 142, commas(row.score), colors.muted, 12, 0.2));
   });
-  parts.push(`<line x1="20" y1="168" x2="475" y2="168" stroke="${colors.rule}"/>`);
-  parts.push(label(20, 186, "@" + data.login, colors.fg, 12, 0.2));
+  parts.push(`<line x1="20" y1="160" x2="475" y2="160" stroke="${colors.rule}"/>`);
+  parts.push(label(20, 178, "@" + data.login, colors.fg, 12, 0.2));
   parts.push("</svg>");
   return parts.join("\n");
 }
@@ -62,13 +84,16 @@ function regular(mode, colors, data, rows) {
 function wide(mode, colors, data) {
   const [name] = dots("TROPHIES", 40, 16, colors.fg, 1.8);
   const parts = [openSvg(mode, 896, 248, data.login + " trophies"), name];
+  const tall = trophy(0, 0, rankScale("wide", "A"), "A", colors)[2];
+  const bottom = 84 + tall;
   data.rows.forEach((row, index) => {
     const x = 20 + index * 146;
-    parts.push(`<rect x="${x}" y="78" width="134" height="148" fill="none" stroke="${colors.rule}"/>`);
-    parts.push(`<rect x="${x + 12}" y="92" width="8" height="8" fill="${colors.mark}"/>`);
-    parts.push(label(x + 12, 150, row.rank, colors.figure, 28, -0.6));
-    parts.push(label(x + 12, 176, row.title, colors.fg, 13, 0.2));
-    parts.push(label(x + 12, 198, commas(row.score), colors.muted, 12, 0.2));
+    const scale = rankScale("wide", row.rank);
+    const measured = trophy(0, 0, scale, row.rank, colors);
+    parts.push(`<rect x="${x}" y="72" width="134" height="156" fill="none" stroke="${colors.rule}"/>`);
+    parts.push(cup(x + (134 - measured[1]) / 2, bottom - measured[2], scale, row, colors)[0]);
+    parts.push(label(x + 12, 168, row.title, colors.fg, 13, 0.2));
+    parts.push(label(x + 12, 190, commas(row.score), colors.muted, 12, 0.2));
   });
   parts.push("</svg>");
   return parts.join("\n");
