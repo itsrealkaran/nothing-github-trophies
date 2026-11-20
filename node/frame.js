@@ -3,20 +3,21 @@
 const { GLYPHS, theme } = require("./nothing");
 const { fixed, py, xml } = require("./format");
 
-// The center letter stays the single-letter size. Extra letters are smaller,
-// share its baseline, and sit in a lower shoulder. The rim rises over the
-// tall letter and steps down over the short ones, like a crown.
+// The center letter stays the single-letter size, with a blank cell between
+// it and the cup. Extra letters are smaller, share its baseline, and sit in a
+// lower shoulder. The rim rises over the tall letter and steps down over the
+// short ones, like a crown.
 const RANKS = new Set(["SSS", "SS", "S", "AAA", "AA", "A", "B", "C"]);
 const SHOULDER = 5;
 
-function trophy(x, y, scale, rank, colors, tip = null) {
+function trophy(x, y, scale, rank, colors, ink = null) {
   const text = RANKS.has(rank) ? rank : "";
   const letter = text.slice(0, 1);
   const count = text.length;
   const step = scale + 1.1;
   const frame = text ? colors.fg : colors.muted;
-  // A reversed theme keeps the letters in the cup color and paints only the tip.
-  const ink = tip ? colors.fg : colors.mark;
+  // A reversed theme passes the cup color so the letters stay unaccented.
+  const fill = ink || colors.mark;
   const parts = [];
   const dot = (originX, originY, col, row, size, fill) => {
     const stride = size + 1.1;
@@ -26,15 +27,15 @@ function trophy(x, y, scale, rank, colors, tip = null) {
       `<circle cx="${fixed(cx, 1)}" cy="${fixed(cy, 1)}" r="${fixed(size / 2, 2)}" fill="${fill}"/>`
     );
   };
-  let letterCol = 3;
-  let handle = 10;
-  if (count < 2) plainCup(dot, x, y, scale, frame, Boolean(text), tip);
-  else [letterCol, handle] = crownCup(dot, x, y, scale, frame, Boolean(text), count, tip);
+  let letterCol = 4;
+  let handle = 12;
+  if (count < 2) plainCup(dot, x, y, scale, frame, Boolean(text));
+  else [letterCol, handle] = crownCup(dot, x, y, scale, frame, Boolean(text), count);
   if (letter) {
-    glyph(dot, x, y, letterCol, 3, scale, GLYPHS[letter], ink);
-    if (count >= 2) sideLetters(dot, x, y, scale, step, count, letter, ink);
+    glyph(dot, x, y, letterCol, 3, scale, GLYPHS[letter], fill);
+    if (count >= 2) sideLetters(dot, x, y, scale, step, count, letter, fill);
   }
-  return [parts.join(""), handle * step + scale, 12 * step + scale];
+  return [parts.join(""), handle * step + scale, 13 * step + scale];
 }
 
 function glyph(dot, x, y, col, row, size, grid, fill) {
@@ -45,30 +46,30 @@ function glyph(dot, x, y, col, row, size, grid, fill) {
   });
 }
 
-function plainCup(dot, x, y, scale, frame, peaked, tip = null) {
-  if (peaked) dot(x, y, 5, 0, scale, tip || frame);
-  for (let col = 2; col < 9; col += 1) dot(x, y, col, 1, scale, frame);
-  for (let row = 2; row < 10; row += 1) {
+function plainCup(dot, x, y, scale, frame, peaked) {
+  if (peaked) dot(x, y, 6, 0, scale, frame);
+  for (let col = 2; col < 11; col += 1) dot(x, y, col, 1, scale, frame);
+  for (let row = 2; row < 11; row += 1) {
     dot(x, y, 1, row, scale, frame);
-    dot(x, y, 9, row, scale, frame);
+    dot(x, y, 11, row, scale, frame);
   }
   for (const row of [4, 5, 6]) {
     dot(x, y, 0, row, scale, frame);
-    dot(x, y, 10, row, scale, frame);
+    dot(x, y, 12, row, scale, frame);
   }
-  for (let col = 1; col < 10; col += 1) dot(x, y, col, 10, scale, frame);
-  for (let col = 3; col < 8; col += 1) dot(x, y, col, 11, scale, frame);
-  for (let col = 2; col < 9; col += 1) dot(x, y, col, 12, scale, frame);
+  for (let col = 1; col < 12; col += 1) dot(x, y, col, 11, scale, frame);
+  for (let col = 4; col < 9; col += 1) dot(x, y, col, 12, scale, frame);
+  for (let col = 3; col < 10; col += 1) dot(x, y, col, 13, scale, frame);
 }
 
-function crownCup(dot, x, y, scale, frame, peaked, count, tip = null) {
+function crownCup(dot, x, y, scale, frame, peaked, count) {
   const left = count >= 3 ? SHOULDER : 0;
   const raisedLeft = 1 + left;
-  const raisedRight = raisedLeft + 8;
+  const raisedRight = raisedLeft + 10;
   const outerRight = raisedRight + SHOULDER;
   const outerLeft = 1;
   const stem = Math.floor((raisedLeft + raisedRight) / 2);
-  if (peaked) dot(x, y, stem, 0, scale, tip || frame);
+  if (peaked) dot(x, y, stem, 0, scale, frame);
   for (let col = raisedLeft + 1; col < raisedRight; col += 1) dot(x, y, col, 1, scale, frame);
   for (let row = 2; row < 5; row += 1) {
     dot(x, y, raisedLeft, row, scale, frame);
@@ -80,23 +81,23 @@ function crownCup(dot, x, y, scale, frame, peaked, count, tip = null) {
   }
   for (let col = raisedRight + 1; col < outerRight; col += 1) dot(x, y, col, 4, scale, frame);
   dot(x, y, outerRight, 4, scale, frame);
-  for (let row = 5; row < 10; row += 1) {
+  for (let row = 5; row < 11; row += 1) {
     dot(x, y, left ? outerLeft : raisedLeft, row, scale, frame);
     dot(x, y, outerRight, row, scale, frame);
   }
   for (const row of left ? [6, 7, 8] : [4, 5, 6]) dot(x, y, 0, row, scale, frame);
   for (const row of [6, 7, 8]) dot(x, y, outerRight + 1, row, scale, frame);
   const wall = left ? outerLeft : raisedLeft;
-  for (let col = wall; col <= outerRight; col += 1) dot(x, y, col, 10, scale, frame);
-  for (let col = stem - 2; col < stem + 3; col += 1) dot(x, y, col, 11, scale, frame);
-  for (let col = stem - 3; col < stem + 4; col += 1) dot(x, y, col, 12, scale, frame);
-  return [raisedLeft + 2, outerRight + 1];
+  for (let col = wall; col <= outerRight; col += 1) dot(x, y, col, 11, scale, frame);
+  for (let col = stem - 2; col < stem + 3; col += 1) dot(x, y, col, 12, scale, frame);
+  for (let col = stem - 3; col < stem + 4; col += 1) dot(x, y, col, 13, scale, frame);
+  return [raisedLeft + 3, outerRight + 1];
 }
 
 function sideLetters(dot, x, y, scale, step, count, letter, fill) {
   const left = count >= 3 ? SHOULDER : 0;
   const raisedLeft = 1 + left;
-  const raisedRight = raisedLeft + 8;
+  const raisedRight = raisedLeft + 10;
   const outerRight = raisedRight + SHOULDER;
   const bottom = 9 * step + scale;
   const maxH = bottom - (5 * step + 1.2);
@@ -148,9 +149,9 @@ function openSvg(mode, width, height, title, mark = 8, margin = 20) {
   );
 }
 
-function label(x, y, text, fill, size = 13, tracking = 0.4) {
+function label(x, y, text, fill, size = 13, tracking = 0.4, anchor = "start") {
   return (
-    `<text x="${py(x)}" y="${py(y)}" fill="${fill}" ` +
+    `<text x="${py(x)}" y="${py(y)}" fill="${fill}" text-anchor="${anchor}" ` +
     `font-family="ui-monospace, Geist Mono, monospace" ` +
     `font-size="${py(size)}" letter-spacing="${py(tracking)}" dominant-baseline="auto">${xml(text)}</text>`
   );
