@@ -119,7 +119,7 @@ def main():
     lines = [
         f"# {data['login']}",
         "",
-        "Compact is the best rank. Regular is the top three. Wide is the six-rank row.",
+        "Compact is the best rank. Regular is the top three. Wide is the six-rank row. Extra letters share the center baseline, and the rim steps down over them.",
         "",
     ]
     for mode in MODES:
