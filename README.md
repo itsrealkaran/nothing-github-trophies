@@ -56,7 +56,7 @@ Leave `theme` and `size` off for the classic regular card. An unknown username, 
 | `blue` | Pure White `#FFFFFF` | N-Blue `#002F6C` |
 | `yellow` | Pure Black `#000000` | N-Yellow `#FFC700` |
 
-The title is a dot grid. The grade is the letter inside the trophy, drawn in the accent. A double grade adds a smaller copy of that letter on the right. A triple grade adds one on each side. The shorter letters share the center letter's baseline, and the rim steps down over them, like a crown. The center letter stays the single-letter size. The category and the score stay in monospace.
+The title is a dot grid. The grade is the letter inside the trophy. On `classic-r` and `white-r` the letter stays the cup color and the single tip dot takes the accent. On the other themes the letter is drawn in the accent. A double grade adds a smaller copy of that letter on the right. A triple grade adds one on each side. The shorter letters share the center letter's baseline, and the rim steps down over them, like a crown. The center letter stays the single-letter size. The category and the score stay in monospace.
 
 ## Sizes
 

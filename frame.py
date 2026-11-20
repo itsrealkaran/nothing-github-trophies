@@ -12,12 +12,14 @@ RANKS = ("SSS", "SS", "S", "AAA", "AA", "A", "B", "C")
 SHOULDER = 5
 
 
-def trophy(x, y, scale, rank, colors):
+def trophy(x, y, scale, rank, colors, tip=None):
     text = rank if rank in RANKS else ""
     letter = text[:1]
     count = len(text)
     step = scale + 1.1
     frame = colors["fg"] if text else colors["muted"]
+    # A reversed theme keeps the letters in the cup color and paints only the tip.
+    ink = colors["fg"] if tip else colors["mark"]
     parts = []
 
     def dot(origin_x, origin_y, col, row, size, fill):
@@ -27,14 +29,14 @@ def trophy(x, y, scale, rank, colors):
         parts.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{size / 2:.2f}" fill="{fill}"/>')
 
     if count < 2:
-        _plain_cup(dot, x, y, scale, frame, bool(text))
+        _plain_cup(dot, x, y, scale, frame, bool(text), tip)
         letter_col, handle = 3, 10
     else:
-        letter_col, handle = _crown_cup(dot, x, y, scale, frame, bool(text), count)
+        letter_col, handle = _crown_cup(dot, x, y, scale, frame, bool(text), count, tip)
     if letter:
-        _glyph(dot, x, y, letter_col, 3, scale, GLYPHS[letter], colors["mark"])
+        _glyph(dot, x, y, letter_col, 3, scale, GLYPHS[letter], ink)
         if count >= 2:
-            _side_letters(dot, x, y, scale, step, count, letter, colors["mark"])
+            _side_letters(dot, x, y, scale, step, count, letter, ink)
     return "".join(parts), handle * step + scale, 12 * step + scale
 
 
@@ -45,9 +47,9 @@ def _glyph(dot, x, y, col, row, size, grid, fill):
                 dot(x, y, col + grid_col, row + grid_row, size, fill)
 
 
-def _plain_cup(dot, x, y, scale, frame, peaked):
+def _plain_cup(dot, x, y, scale, frame, peaked, tip=None):
     if peaked:
-        dot(x, y, 5, 0, scale, frame)
+        dot(x, y, 5, 0, scale, tip or frame)
     for col in range(2, 9):
         dot(x, y, col, 1, scale, frame)
     for row in range(2, 10):
@@ -64,7 +66,7 @@ def _plain_cup(dot, x, y, scale, frame, peaked):
         dot(x, y, col, 12, scale, frame)
 
 
-def _crown_cup(dot, x, y, scale, frame, peaked, count):
+def _crown_cup(dot, x, y, scale, frame, peaked, count, tip=None):
     left = SHOULDER if count >= 3 else 0
     raised_left = 1 + left
     raised_right = raised_left + 8
@@ -72,7 +74,7 @@ def _crown_cup(dot, x, y, scale, frame, peaked, count):
     outer_left = 1
     stem = (raised_left + raised_right) // 2
     if peaked:
-        dot(x, y, stem, 0, scale, frame)
+        dot(x, y, stem, 0, scale, tip or frame)
     for col in range(raised_left + 1, raised_right):
         dot(x, y, col, 1, scale, frame)
     for row in range(2, 5):
