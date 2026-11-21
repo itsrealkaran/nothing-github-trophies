@@ -5,12 +5,10 @@ from datetime import datetime, timedelta, timezone
 from nothing import GLYPHS, theme
 
 
-# The center letter stays the single-letter size, with a blank cell between
-# it and the cup. Extra letters are smaller, share its baseline, and sit in a
-# lower shoulder. The rim rises over the tall letter and steps down over the
-# short ones, like a crown.
+# A glass disc holds the rank. Two arms cradle its lower half and stand on a flat base.
+# A double grade adds a smaller letter on the right. A triple grade adds one on each
+# side. The rank is centered in the disc, and the shorter letters share its baseline.
 RANKS = ("SSS", "SS", "S", "AAA", "AA", "A", "B", "C")
-SHOULDER = 5
 
 
 def trophy(x, y, scale, rank, colors, ink=None):
@@ -29,15 +27,7 @@ def trophy(x, y, scale, rank, colors, ink=None):
         cy = origin_y + row * stride + size / 2
         parts.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{size / 2:.2f}" fill="{fill}"/>')
 
-    if count < 2:
-        _plain_cup(dot, x, y, scale, frame, bool(text))
-        letter_col, handle = 4, 12
-    else:
-        letter_col, handle = _crown_cup(dot, x, y, scale, frame, bool(text), count)
-    if letter:
-        _glyph(dot, x, y, letter_col, 3, scale, GLYPHS[letter], ink)
-        if count >= 2:
-            _side_letters(dot, x, y, scale, step, count, letter, ink)
+    handle = _award(dot, x, y, scale, step, frame, count, letter, ink)
     return "".join(parts), handle * step + scale, 13 * step + scale
 
 
@@ -48,85 +38,127 @@ def _glyph(dot, x, y, col, row, size, grid, fill):
                 dot(x, y, col + grid_col, row + grid_row, size, fill)
 
 
-def _plain_cup(dot, x, y, scale, frame, peaked):
-    if peaked:
-        dot(x, y, 6, 0, scale, frame)
-    for col in range(2, 11):
-        dot(x, y, col, 1, scale, frame)
-    for row in range(2, 11):
-        dot(x, y, 1, row, scale, frame)
-        dot(x, y, 11, row, scale, frame)
-    for row in (4, 5, 6):
-        dot(x, y, 0, row, scale, frame)
-        dot(x, y, 12, row, scale, frame)
-    for col in range(1, 12):
-        dot(x, y, col, 11, scale, frame)
-    for col in range(4, 9):
-        dot(x, y, col, 12, scale, frame)
-    for col in range(3, 10):
-        dot(x, y, col, 13, scale, frame)
+def _award(dot, x, y, scale, step, frame, count, letter, fill):
+    placed = _placement(scale, step, count)
+    _disc(dot, x, y, scale, frame, placed["c0"], placed["c1"])
+    _arms(dot, x, y, scale, frame, placed["c0"], placed["c1"])
+    _base(dot, x, y, scale, frame, placed["c0"], placed["c1"])
+    if letter:
+        _rank_letters(dot, x, y, scale, step, placed, letter, fill)
+    return placed["handle"]
 
 
-def _crown_cup(dot, x, y, scale, frame, peaked, count):
-    left = SHOULDER if count >= 3 else 0
-    raised_left = 1 + left
-    raised_right = raised_left + 10
-    outer_right = raised_right + SHOULDER
-    outer_left = 1
-    stem = (raised_left + raised_right) // 2
-    if peaked:
-        dot(x, y, stem, 0, scale, frame)
-    for col in range(raised_left + 1, raised_right):
-        dot(x, y, col, 1, scale, frame)
-    for row in range(2, 5):
-        dot(x, y, raised_left, row, scale, frame)
-        dot(x, y, raised_right, row, scale, frame)
-    if left:
-        for col in range(outer_left + 1, raised_left):
-            dot(x, y, col, 4, scale, frame)
-        dot(x, y, outer_left, 4, scale, frame)
-    for col in range(raised_right + 1, outer_right):
-        dot(x, y, col, 4, scale, frame)
-    dot(x, y, outer_right, 4, scale, frame)
-    for row in range(5, 11):
-        dot(x, y, outer_left if left else raised_left, row, scale, frame)
-        dot(x, y, outer_right, row, scale, frame)
-    for row in ((6, 7, 8) if left else (4, 5, 6)):
-        dot(x, y, 0, row, scale, frame)
-    for row in (6, 7, 8):
-        dot(x, y, outer_right + 1, row, scale, frame)
-    wall = outer_left if left else raised_left
-    for col in range(wall, outer_right + 1):
-        dot(x, y, col, 11, scale, frame)
-    for col in range(stem - 2, stem + 3):
-        dot(x, y, col, 12, scale, frame)
-    for col in range(stem - 3, stem + 4):
-        dot(x, y, col, 13, scale, frame)
-    return raised_left + 3, outer_right + 1
-
-
-def _side_letters(dot, x, y, scale, step, count, letter, fill):
-    left = SHOULDER if count >= 3 else 0
-    raised_left = 1 + left
-    raised_right = raised_left + 10
-    outer_right = raised_right + SHOULDER
-    bottom = 9 * step + scale
-    max_h = bottom - (5 * step + 1.2)
-    side = min(scale * 0.55, (max_h - 6.6) / 7)
-    shoulders = []
-    if left:
-        shoulders.append((1 * step + scale, raised_left * step))
-    shoulders.append((raised_right * step + scale, outer_right * step))
-    gap = min(right - left_edge for left_edge, right in shoulders)
-    side = min(side, ((gap - 3.2) - 4.4) / 5)
-    if side < 0.7:
-        return
-    side_h = 6 * (side + 1.1) + side
+def _placement(scale, step, count):
+    c0 = 1
+    if count < 2:
+        return {"c0": c0, "c1": 11, "handle": 12, "group": 0, "count": count}
+    side = scale * 0.52
+    gap = max(1.1, step * 0.22)
+    big_w = 4 * step + scale
     side_w = 4 * (side + 1.1) + side
-    side_y = y + bottom - side_h
-    for left_edge, right in shoulders:
-        origin = x + left_edge + (right - left_edge - side_w) / 2
-        _glyph(dot, origin, side_y, 0, 0, side, GLYPHS[letter], fill)
+    group = side_w + gap + big_w + gap + side_w if count >= 3 else big_w + gap + side_w
+    margin = step * 0.85
+    span = 10
+    while span * step - scale < group + margin * 2:
+        span += 2
+    return {
+        "c0": c0,
+        "c1": c0 + span,
+        "handle": c0 + span + 1,
+        "group": group,
+        "side": side,
+        "side_w": side_w,
+        "gap": gap,
+        "big_w": big_w,
+        "count": count,
+    }
+
+
+# Offsets from the disc's center. One center is a circle. Two centers stretch it
+# into the wider plaque that holds the extra letters.
+PROFILE = (
+    (-2, -1, 0, 1, 2),
+    (-3, -2, 2, 3),
+    (-4, 4),
+    (-5, -4, 4, 5),
+    (-5, 5),
+    (-5, 5),
+    (-5, 5),
+    (-5, -4, 4, 5),
+    (-4, 4),
+    (-3, -2, 2, 3),
+    (-2, -1, 0, 1, 2),
+)
+
+
+def _disc(dot, x, y, scale, frame, c0, c1):
+    left_center = c0 + 5
+    right_center = c1 - 5
+    for row, offsets in enumerate(PROFILE):
+        cols = set()
+        for offset in offsets:
+            if offset <= 0:
+                cols.add(left_center + offset)
+            if offset >= 0:
+                cols.add(right_center + offset)
+        if right_center > left_center and row in (0, 10):
+            inner_left = left_center + max(offset for offset in offsets if offset <= 0)
+            inner_right = right_center + min(offset for offset in offsets if offset >= 0)
+            cols.update(range(inner_left, inner_right + 1))
+        for col in cols:
+            dot(x, y, col, row, scale, frame)
+
+
+def _arms(dot, x, y, scale, frame, c0, c1):
+    left = c0 - 1
+    right = c1 + 1
+    center = int((c0 + c1) / 2)
+    for row in range(4, 9):
+        dot(x, y, left, row, scale, frame)
+        dot(x, y, right, row, scale, frame)
+    _hook(dot, x, y, scale, frame, left, center - 4, 1)
+    _hook(dot, x, y, scale, frame, right, center + 4, -1)
+
+
+def _hook(dot, x, y, scale, frame, outer, edge, inward):
+    sign = 1 if inward > 0 else -1
+    first = outer + sign
+    dot(x, y, first, 8, scale, frame)
+    dot(x, y, first, 9, scale, frame)
+    span = abs(edge - first)
+    if span > 1:
+        mid = first + sign * int(span / 2 + 0.5)
+        for col in range(min(first, mid), max(first, mid) + 1):
+            dot(x, y, col, 9, scale, frame)
+        for col in range(min(mid, edge), max(mid, edge) + 1):
+            dot(x, y, col, 10, scale, frame)
+    dot(x, y, edge, 10, scale, frame)
+    dot(x, y, edge, 11, scale, frame)
+    dot(x, y, edge + inward, 11, scale, frame)
+
+
+def _base(dot, x, y, scale, frame, c0, c1):
+    center = int((c0 + c1) / 2)
+    for col in range(center - 4, center + 4 + 1):
+        dot(x, y, col, 12, scale, frame)
+        dot(x, y, col, 13, scale, frame)
+
+
+def _rank_letters(dot, x, y, scale, step, placed, letter, fill):
+    if not placed["group"]:
+        _glyph(dot, x, y, 4, 2, scale, GLYPHS[letter], fill)
+        return
+    mid = x + ((placed["c0"] + placed["c1"]) / 2) * step + scale / 2
+    cursor = mid - placed["group"] / 2
+    side_h = 6 * (placed["side"] + 1.1) + placed["side"]
+    side_y = y + 8 * step + scale - side_h
+    grid = GLYPHS[letter]
+    if placed["count"] >= 3:
+        _glyph(dot, cursor, side_y, 0, 0, placed["side"], grid, fill)
+        cursor += placed["side_w"] + placed["gap"]
+    _glyph(dot, cursor, y, 0, 2, scale, grid, fill)
+    cursor += placed["big_w"] + placed["gap"]
+    _glyph(dot, cursor, side_y, 0, 0, placed["side"], grid, fill)
 
 
 def dots(text, x, y, fill, scale=2.4):
