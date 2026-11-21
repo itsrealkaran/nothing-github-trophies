@@ -17,22 +17,23 @@ function trophy(x, y, scale, rank, colors, ink = null) {
   // A reversed theme passes the cup color so the letters stay unaccented.
   const fill = ink || colors.mark;
   const parts = [];
-  const dot = (originX, originY, col, row, size, fill) => {
+  const dot = (originX, originY, col, row, size, fill, radius = null) => {
     const stride = size + 1.1;
     const cx = originX + col * stride + size / 2;
     const cy = originY + row * stride + size / 2;
+    const r = radius == null ? size / 2 : radius;
     parts.push(
-      `<circle cx="${fixed(cx, 1)}" cy="${fixed(cy, 1)}" r="${fixed(size / 2, 2)}" fill="${fill}"/>`
+      `<circle cx="${fixed(cx, 1)}" cy="${fixed(cy, 1)}" r="${fixed(r, 2)}" fill="${fill}"/>`
     );
   };
   const handle = award(dot, x, y, scale, step, frame, count, letter, fill);
-  return [parts.join(""), handle * step + scale, 13 * step + scale];
+  return [parts.join(""), handle * step + scale, 15 * step + scale];
 }
 
-function glyph(dot, x, y, col, row, size, grid, fill) {
+function glyph(dot, x, y, col, row, size, grid, fill, radius = null) {
   grid.forEach((bits, gridRow) => {
     for (let gridCol = 0; gridCol < bits.length; gridCol += 1) {
-      if (bits[gridCol] === "1") dot(x, y, col + gridCol, row + gridRow, size, fill);
+      if (bits[gridCol] === "1") dot(x, y, col + gridCol, row + gridRow, size, fill, radius);
     }
   });
 }
@@ -46,18 +47,39 @@ function award(dot, x, y, scale, step, frame, count, letter, fill) {
   return placed.handle;
 }
 
+function metrics(scale) {
+  const ink = scale * 0.7;
+  const side = ink * 0.62;
+  const [bigW, bigH] = inkSize(ink);
+  const [sideW, sideH] = inkSize(side);
+  const radius = side * 0.58;
+  const spill = Math.max(0, radius - side / 2);
+  return {
+    ink,
+    side,
+    bigW,
+    bigH,
+    sideW,
+    sideH,
+    radius,
+    spill,
+    sideBox: sideW + spill * 2,
+    gap: Math.max(1.5, (ink + 1.1) * 0.48),
+  };
+}
+
 function placement(scale, step, count) {
   const c0 = 1;
   if (count < 2) return { c0, c1: 11, handle: 12, group: 0, count };
-  const side = scale * 0.52;
-  const gap = Math.max(1.1, step * 0.22);
-  const bigW = 4 * step + scale;
-  const sideW = 4 * (side + 1.1) + side;
-  const group = count >= 3 ? sideW + gap + bigW + gap + sideW : bigW + gap + sideW;
-  const margin = step * 0.85;
+  const box = metrics(scale);
+  const group = count >= 3
+    ? box.sideBox + box.gap + box.bigW + box.gap + box.sideBox
+    : box.bigW + box.gap + box.sideBox;
+  // The glass stays clear of the grade on both sides.
+  const margin = step * 2.35;
   let span = 10;
   while (span * step - scale < group + margin * 2) span += 2;
-  return { c0, c1: c0 + span, handle: c0 + span + 1, group, side, sideW, gap, bigW, count };
+  return { c0, c1: c0 + span, handle: c0 + span + 1, group, count };
 }
 
 // Offsets from the disc's center. One center is a circle. Two centers stretch it
@@ -67,6 +89,8 @@ const PROFILE = [
   [-3, -2, 2, 3],
   [-4, 4],
   [-5, -4, 4, 5],
+  [-5, 5],
+  [-5, 5],
   [-5, 5],
   [-5, 5],
   [-5, 5],
@@ -85,7 +109,7 @@ function disc(dot, x, y, scale, frame, c0, c1) {
       if (offset <= 0) cols.add(leftCenter + offset);
       if (offset >= 0) cols.add(rightCenter + offset);
     });
-    if (rightCenter > leftCenter && (row === 0 || row === 10)) {
+    if (rightCenter > leftCenter && (row === 0 || row === 12)) {
       const innerLeft = leftCenter + Math.max(...offsets.filter((offset) => offset <= 0));
       const innerRight = rightCenter + Math.min(...offsets.filter((offset) => offset >= 0));
       for (let col = innerLeft; col <= innerRight; col += 1) cols.add(col);
@@ -98,7 +122,7 @@ function arms(dot, x, y, scale, frame, c0, c1) {
   const left = c0 - 1;
   const right = c1 + 1;
   const center = (c0 + c1) / 2;
-  for (let row = 4; row <= 8; row += 1) {
+  for (let row = 6; row <= 10; row += 1) {
     dot(x, y, left, row, scale, frame);
     dot(x, y, right, row, scale, frame);
   }
@@ -109,48 +133,70 @@ function arms(dot, x, y, scale, frame, c0, c1) {
 function hook(dot, x, y, scale, frame, outer, edge, inward) {
   const sign = inward > 0 ? 1 : -1;
   const first = outer + sign;
-  dot(x, y, first, 8, scale, frame);
-  dot(x, y, first, 9, scale, frame);
+  dot(x, y, first, 10, scale, frame);
+  dot(x, y, first, 11, scale, frame);
   const span = Math.abs(edge - first);
   if (span > 1) {
     const mid = first + sign * Math.floor(span / 2 + 0.5);
     for (let col = Math.min(first, mid); col <= Math.max(first, mid); col += 1) {
-      dot(x, y, col, 9, scale, frame);
+      dot(x, y, col, 11, scale, frame);
     }
     for (let col = Math.min(mid, edge); col <= Math.max(mid, edge); col += 1) {
-      dot(x, y, col, 10, scale, frame);
+      dot(x, y, col, 12, scale, frame);
     }
   }
-  dot(x, y, edge, 10, scale, frame);
-  dot(x, y, edge, 11, scale, frame);
-  dot(x, y, edge + inward, 11, scale, frame);
+  dot(x, y, edge, 12, scale, frame);
+  dot(x, y, edge, 13, scale, frame);
+  dot(x, y, edge + inward, 13, scale, frame);
 }
 
 function base(dot, x, y, scale, frame, c0, c1) {
   const center = (c0 + c1) / 2;
   for (let col = center - 4; col <= center + 4; col += 1) {
-    dot(x, y, col, 12, scale, frame);
-    dot(x, y, col, 13, scale, frame);
+    dot(x, y, col, 14, scale, frame);
+    dot(x, y, col, 15, scale, frame);
   }
 }
 
+function inkSize(size) {
+  const stride = size + 1.1;
+  return [4 * stride + size, 6 * stride + size];
+}
+
+function centeredGlyph(dot, cx, cy, size, grid, fill, radius = null) {
+  const [width, height] = inkSize(size);
+  glyph(dot, cx - width / 2, cy - height / 2, 0, 0, size, grid, fill, radius);
+}
+
 function rankLetters(dot, x, y, scale, step, placed, letter, fill) {
+  // The grade sits inside the glass, smaller than the disc, so the rim stays clear.
+  const ink = scale * 0.7;
+  const grid = GLYPHS[letter];
+  const cy = y + 6 * step + scale / 2;
   if (!placed.group) {
-    glyph(dot, x, y, 4, 2, scale, GLYPHS[letter], fill);
+    const cx = x + ((placed.c0 + placed.c1) / 2) * step + scale / 2;
+    centeredGlyph(dot, cx, cy, ink, grid, fill);
     return;
   }
+  const box = metrics(scale);
+  const side = box.side;
+  const [bigW, bigH] = [box.bigW, box.bigH];
+  const [sideW, sideH] = [box.sideW, box.sideH];
+  const radius = box.radius;
+  const spill = box.spill;
+  const sideBox = box.sideBox;
+  const gap = box.gap;
+  const sideCy = cy + bigH / 2 - sideH / 2;
+  const group = placed.count >= 3 ? sideBox + gap + bigW + gap + sideBox : bigW + gap + sideBox;
   const mid = x + ((placed.c0 + placed.c1) / 2) * step + scale / 2;
-  let cursor = mid - placed.group / 2;
-  const sideH = 6 * (placed.side + 1.1) + placed.side;
-  const sideY = y + 8 * step + scale - sideH;
-  const grid = GLYPHS[letter];
+  let cursor = mid - group / 2;
   if (placed.count >= 3) {
-    glyph(dot, cursor, sideY, 0, 0, placed.side, grid, fill);
-    cursor += placed.sideW + placed.gap;
+    centeredGlyph(dot, cursor + spill + sideW / 2, sideCy, side, grid, fill, radius);
+    cursor += sideBox + gap;
   }
-  glyph(dot, cursor, y, 0, 2, scale, grid, fill);
-  cursor += placed.bigW + placed.gap;
-  glyph(dot, cursor, sideY, 0, 0, placed.side, grid, fill);
+  centeredGlyph(dot, cursor + bigW / 2, cy, ink, grid, fill);
+  cursor += bigW + gap;
+  centeredGlyph(dot, cursor + spill + sideW / 2, sideCy, side, grid, fill, radius);
 }
 
 function dots(text, x, y, fill, scale = 2.4) {
@@ -175,14 +221,23 @@ function dots(text, x, y, fill, scale = 2.4) {
   return [parts.join(""), cursor - x];
 }
 
-function openSvg(mode, width, height, title, mark = 8, margin = 20) {
+function openSvg(mode, width, height, title, mark = 8, margin = 20, border = true) {
   const colors = theme(mode);
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="${py(width)}" height="${py(height)}" ` +
     `viewBox="0 0 ${py(width)} ${py(height)}" role="img">` +
     `<title>${xml(title)}</title>` +
-    `<rect width="${py(width)}" height="${py(height)}" rx="16" fill="${colors.bg}"/>` +
+    cardRect(width, height, colors, border) +
     `<rect x="${py(margin)}" y="${py(margin)}" width="${py(mark)}" height="${py(mark)}" fill="${colors.mark}"/>`
+  );
+}
+
+function cardRect(width, height, colors, border, fill) {
+  const ink = fill || colors.bg;
+  if (!border) return `<rect width="${py(width)}" height="${py(height)}" rx="16" fill="${ink}"/>`;
+  return (
+    `<rect x="0.5" y="0.5" width="${py(width - 1)}" height="${py(height - 1)}" ` +
+    `rx="8" fill="${ink}" stroke="${colors.rule}"/>`
   );
 }
 

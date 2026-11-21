@@ -10,16 +10,16 @@ from nothing import MODES, SIZES, theme
 ROOT = Path(__file__).resolve().parent
 
 
-def render(mode, size, data):
+def render(mode, size, data, border=True):
     colors = theme(mode)
     ranked = sorted(data["rows"], key=lambda row: (_strength(row["rank"]), -row["score"]))
     if size == "mini":
-        return _mini(mode, colors, data, ranked[0])
+        return _mini(mode, colors, data, ranked[0], border)
     if size == "compact":
-        return _compact(mode, colors, data, ranked[0])
+        return _compact(mode, colors, data, ranked[0], border)
     if size == "wide":
-        return _wide(mode, colors, data)
-    return _regular(mode, colors, data, ranked[:3])
+        return _wide(mode, colors, data, border)
+    return _regular(mode, colors, data, ranked[:3], border)
 
 
 def _strength(rank):
@@ -84,17 +84,17 @@ def _plates(x, y, width, height, rows, colors, mode):
     )
 
 
-def _mini(mode, colors, data, best):
+def _mini(mode, colors, data, best, border):
     name, _ = dots("TROPHIES", 28, 12, colors["fg"], scale=1.15)
     return "\n".join([
-        open_svg(mode, 220, 148, f"{data['login']} trophies", mark=6, margin=14),
+        open_svg(mode, 220, 148, f"{data['login']} trophies", mark=6, margin=14, border=border),
         name,
         _plate(12, 38, 196, 98, best, colors, _cup_scale(176, 50, best["rank"], colors, mode), mode),
         "</svg>",
     ])
 
 
-def _compact(mode, colors, data, best):
+def _compact(mode, colors, data, best, border):
     name, _ = dots("TROPHIES", 36, 16, colors["fg"], scale=1.8)
     x, y, width, height = 16, 46, 463, 70
     scale = _cup_scale(168, height - 10, best["rank"], colors, mode)
@@ -103,7 +103,7 @@ def _compact(mode, colors, data, best):
     text_left = x + 28 + cup_w + 20
     text_mid = text_left + (x + width - 16 - text_left) / 2
     return "\n".join([
-        open_svg(mode, 495, 132, f"{data['login']} trophies"),
+        open_svg(mode, 495, 132, f"{data['login']} trophies", border=border),
         name,
         _rule(x, y, width, height, colors["rule"]),
         _square(x + 10, y + 10, 5, colors["mark"]),
@@ -114,21 +114,22 @@ def _compact(mode, colors, data, best):
     ])
 
 
-def _regular(mode, colors, data, rows):
+def _regular(mode, colors, data, rows, border):
     name, _ = dots("TROPHIES", 36, 16, colors["fg"], scale=1.8)
+    width = 440
     return "\n".join([
-        open_svg(mode, 495, 192, f"{data['login']} trophies"),
+        open_svg(mode, width, 208, f"{data['login']} trophies", border=border),
         name,
-        label(475, 30, f"@{data['login']}", colors["muted"], 12, 0.2, "end"),
-        _plates(16, 48, 463, 128, rows, colors, mode),
+        label(width - 20, 30, f"@{data['login']}", colors["muted"], 12, 0.2, "end"),
+        _plates(16, 48, width - 32, 144, rows, colors, mode),
         "</svg>",
     ])
 
 
-def _wide(mode, colors, data):
+def _wide(mode, colors, data, border):
     name, _ = dots("TROPHIES", 36, 16, colors["fg"], scale=1.8)
     return "\n".join([
-        open_svg(mode, 896, 248, f"{data['login']} trophies"),
+        open_svg(mode, 896, 248, f"{data['login']} trophies", border=border),
         name,
         _plates(16, 48, 864, 184, data["rows"], colors, mode),
         "</svg>",
