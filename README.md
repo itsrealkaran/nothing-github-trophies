@@ -64,7 +64,7 @@ The title is a dot grid. Each category is a plate. A small square, the theme mar
 | --- | --- | --- |
 | `mini` | 220×148 | The strongest rank. |
 | `compact` | 495px wide | That same rank. |
-| `regular` | 440px wide | The top three. Default. |
+| `regular` | 408px wide | The top three. Default. |
 | `wide` | 896px wide | All six, in category order. |
 
 The files in `dist/` use the theme name, then the size: `classic-regular.svg`.
