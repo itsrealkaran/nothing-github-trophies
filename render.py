@@ -116,7 +116,7 @@ def _compact(mode, colors, data, best, border):
 
 def _regular(mode, colors, data, rows, border):
     name, _ = dots("TROPHIES", 36, 16, colors["fg"], scale=1.8)
-    width = 440
+    width = 408
     return "\n".join([
         open_svg(mode, width, 208, f"{data['login']} trophies", border=border),
         name,

@@ -109,11 +109,12 @@ function compact(mode, colors, data, best, border) {
 
 function regular(mode, colors, data, rows, border) {
   const [name] = dots("TROPHIES", 36, 16, colors.fg, 1.8);
+  const width = 408;
   return [
-    openSvg(mode, 440, 208, data.login + " trophies", 8, 20, border),
+    openSvg(mode, width, 208, data.login + " trophies", 8, 20, border),
     name,
-    label(420, 30, "@" + data.login, colors.muted, 12, 0.2, "end"),
-    plates(16, 48, 408, 144, rows, colors, mode),
+    label(width - 20, 30, "@" + data.login, colors.muted, 12, 0.2, "end"),
+    plates(16, 48, width - 32, 144, rows, colors, mode),
     "</svg>",
   ].join("\n");
 }
