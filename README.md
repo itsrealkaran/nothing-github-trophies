@@ -41,7 +41,7 @@ https://github.com/itsrealkaran/nothing-github-trophies?username=itsrealkaran
 ![trophies](https://github.com/itsrealkaran/nothing-github-trophies?username=itsrealkaran)
 ```
 
-Leave `theme` and `size` off for the classic regular card. An unknown username, theme, or size still returns an SVG, so the image slot in a README stays intact.
+Leave `theme` and `size` off for the classic regular card. It has a hairline border and a small corner. An unknown username, theme, or size still returns an SVG, so the image slot in a README stays intact.
 
 ## Themes
 
@@ -64,7 +64,7 @@ The title is a dot grid. Each category is a plate. A small square, the theme mar
 | --- | --- | --- |
 | `mini` | 220×148 | The strongest rank. |
 | `compact` | 495px wide | That same rank. |
-| `regular` | 495px wide | The top three. Default. |
+| `regular` | 440px wide | The top three. Default. |
 | `wide` | 896px wide | All six, in category order. |
 
 The files in `dist/` use the theme name, then the size: `classic-regular.svg`.
@@ -76,6 +76,7 @@ The files in `dist/` use the theme name, then the size: `classic-regular.svg`.
 | `username` | yes |  | GitHub login. `user` is the same parameter. |
 | `theme` | no | `classic` | One of the themes above. |
 | `size` | no | `regular` | One of the sizes above. |
+| `border` | no | `1` | `0` removes the border and uses the rounder corner. |
 
 ## Examples
 

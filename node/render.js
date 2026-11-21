@@ -6,13 +6,13 @@ const { commas, fixed } = require("./format");
 
 const LADDER = ["SSS", "SS", "S", "AAA", "AA", "A", "B", "C"];
 
-function render(mode, size, data) {
+function render(mode, size, data, border = true) {
   const colors = theme(mode);
   const ranked = data.rows.slice().sort((a, b) => strength(a.rank) - strength(b.rank) || b.score - a.score);
-  if (size === "mini") return mini(mode, colors, data, ranked[0]);
-  if (size === "compact") return compact(mode, colors, data, ranked[0]);
-  if (size === "wide") return wide(mode, colors, data);
-  return regular(mode, colors, data, ranked.slice(0, 3));
+  if (size === "mini") return mini(mode, colors, data, ranked[0], border);
+  if (size === "compact") return compact(mode, colors, data, ranked[0], border);
+  if (size === "wide") return wide(mode, colors, data, border);
+  return regular(mode, colors, data, ranked.slice(0, 3), border);
 }
 
 function strength(rank) {
@@ -74,17 +74,17 @@ function plates(x, y, width, height, rows, colors, mode) {
   return rows.map((row, index) => plate(x + index * span, y, span, height, row, colors, scale, mode)).join("");
 }
 
-function mini(mode, colors, data, best) {
+function mini(mode, colors, data, best, border) {
   const [name] = dots("TROPHIES", 28, 12, colors.fg, 1.15);
   return [
-    openSvg(mode, 220, 148, data.login + " trophies", 6, 14),
+    openSvg(mode, 220, 148, data.login + " trophies", 6, 14, border),
     name,
     plate(12, 38, 196, 98, best, colors, cupScale(176, 50, best.rank, colors, mode), mode),
     "</svg>",
   ].join("\n");
 }
 
-function compact(mode, colors, data, best) {
+function compact(mode, colors, data, best, border) {
   const [name] = dots("TROPHIES", 36, 16, colors.fg, 1.8);
   const x = 16;
   const y = 46;
@@ -96,7 +96,7 @@ function compact(mode, colors, data, best) {
   const textLeft = x + 28 + measured[1] + 20;
   const textMid = textLeft + (x + width - 16 - textLeft) / 2;
   return [
-    openSvg(mode, 495, 132, data.login + " trophies"),
+    openSvg(mode, 495, 132, data.login + " trophies", 8, 20, border),
     name,
     rule(x, y, width, height, colors.rule),
     square(x + 10, y + 10, 5, colors.mark),
@@ -107,21 +107,21 @@ function compact(mode, colors, data, best) {
   ].join("\n");
 }
 
-function regular(mode, colors, data, rows) {
+function regular(mode, colors, data, rows, border) {
   const [name] = dots("TROPHIES", 36, 16, colors.fg, 1.8);
   return [
-    openSvg(mode, 495, 192, data.login + " trophies"),
+    openSvg(mode, 440, 208, data.login + " trophies", 8, 20, border),
     name,
-    label(475, 30, "@" + data.login, colors.muted, 12, 0.2, "end"),
-    plates(16, 48, 463, 128, rows, colors, mode),
+    label(420, 30, "@" + data.login, colors.muted, 12, 0.2, "end"),
+    plates(16, 48, 408, 144, rows, colors, mode),
     "</svg>",
   ].join("\n");
 }
 
-function wide(mode, colors, data) {
+function wide(mode, colors, data, border) {
   const [name] = dots("TROPHIES", 36, 16, colors.fg, 1.8);
   return [
-    openSvg(mode, 896, 248, data.login + " trophies"),
+    openSvg(mode, 896, 248, data.login + " trophies", 8, 20, border),
     name,
     plates(16, 48, 864, 184, data.rows, colors, mode),
     "</svg>",
