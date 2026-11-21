@@ -56,7 +56,7 @@ Leave `theme` and `size` off for the classic regular card. An unknown username, 
 | `blue` | Pure White `#FFFFFF` | N-Blue `#002F6C` |
 | `yellow` | Pure Black `#000000` | N-Yellow `#FFC700` |
 
-The title is a dot grid. Each category is a plate. A small square, the theme mark, sits in the corner of the plate. On `classic-r` and `white-r` that square is N-Red and the letter stays the cup color. On the other themes the letter is drawn in the accent. A double grade adds a smaller copy of that letter on the right. A triple grade adds one on each side. The shorter letters share the center letter's baseline, and the rim steps down over them, like a crown. The center letter stays the single-letter size, clear of the cup. The category and the score stay in monospace, pinned to the bottom of the plate.
+The title is a dot grid. Each category is a plate. A small square, the theme mark, sits in the corner of the plate. On `classic-r` and `white-r` that square is N-Red and the letter stays the cup color. On the other themes the letter is drawn in the accent. A double grade adds a smaller copy of that letter on the right. A triple grade adds one on each side. The shorter letters share the center letter's baseline, and the rank is centered in the disc. The trophy is a glass circle held by two arms, on a rectangular base the width of the single-letter award. The category and the score stay in monospace, centered at the bottom of the plate.
 
 ## Sizes
 
