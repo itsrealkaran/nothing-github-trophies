@@ -44,23 +44,40 @@ def _square(x, y, size, color):
     return f'<rect x="{x:.1f}" y="{y:.1f}" width="{size}" height="{size}" fill="{color}"/>'
 
 
+def _cup_scale(max_width, max_height, rank, colors, mode):
+    ink = _ink(mode, colors)
+    best = 1.5
+    scale = 1.5
+    while scale <= 4.8:
+        _mark, cup_w, cup_h = trophy(0, 0, scale, rank, colors, ink)
+        if cup_w > max_width or cup_h > max_height:
+            break
+        best = scale
+        scale = round(scale + 0.05, 2)
+    return round(best, 2)
+
+
 def _plate(x, y, width, height, row, colors, scale, mode):
     ink = _ink(mode, colors)
     _mark, cup_w, cup_h = trophy(0, 0, scale, row["rank"], colors, ink)
-    top, band = 18, 34
+    top, band = 16, 32
     cup_y = y + top + max(0, (height - top - band - cup_h) / 2)
     cup_x = x + (width - cup_w) / 2
+    mid = x + width / 2
     return "".join([
         _rule(x, y, width, height, colors["rule"]),
         _square(x + 10, y + 10, 5, colors["mark"]),
         trophy(cup_x, cup_y, scale, row["rank"], colors, ink)[0],
-        label(x + 10, y + height - 20, row["title"], colors["fg"], 12, 0.5),
-        label(x + 10, y + height - 6, f"{row['score']:,}", colors["muted"], 11, 0.15),
+        label(mid, y + height - 18, row["title"], colors["fg"], 12, 0.4, "middle"),
+        label(mid, y + height - 5, f"{row['score']:,}", colors["muted"], 11, 0.1, "middle"),
     ])
 
 
-def _plates(x, y, width, height, rows, colors, scale, mode):
+def _plates(x, y, width, height, rows, colors, mode):
     span = width / len(rows)
+    ink = _ink(mode, colors)
+    widest = max(rows, key=lambda row: trophy(0, 0, 2, row["rank"], colors, ink)[1])
+    scale = _cup_scale(span - 12, height - 48, widest["rank"], colors, mode)
     return "".join(
         _plate(x + index * span, y, span, height, row, colors, scale, mode)
         for index, row in enumerate(rows)
@@ -72,7 +89,7 @@ def _mini(mode, colors, data, best):
     return "\n".join([
         open_svg(mode, 220, 148, f"{data['login']} trophies", mark=6, margin=14),
         name,
-        _plate(12, 38, 196, 98, best, colors, 2.0, mode),
+        _plate(12, 38, 196, 98, best, colors, _cup_scale(176, 50, best["rank"], colors, mode), mode),
         "</svg>",
     ])
 
@@ -80,17 +97,19 @@ def _mini(mode, colors, data, best):
 def _compact(mode, colors, data, best):
     name, _ = dots("TROPHIES", 36, 16, colors["fg"], scale=1.8)
     x, y, width, height = 16, 46, 463, 70
-    scale = 2.05
+    scale = _cup_scale(168, height - 10, best["rank"], colors, mode)
     ink = _ink(mode, colors)
     _mark, cup_w, cup_h = trophy(0, 0, scale, best["rank"], colors, ink)
+    text_left = x + 28 + cup_w + 20
+    text_mid = text_left + (x + width - 16 - text_left) / 2
     return "\n".join([
         open_svg(mode, 495, 132, f"{data['login']} trophies"),
         name,
         _rule(x, y, width, height, colors["rule"]),
         _square(x + 10, y + 10, 5, colors["mark"]),
-        trophy(x + 36, y + (height - cup_h) / 2, scale, best["rank"], colors, ink)[0],
-        label(x + 36 + cup_w + 28, y + 32, best["title"], colors["fg"], 16, 0.3),
-        label(x + 36 + cup_w + 28, y + 54, f"{best['score']:,}", colors["muted"], 13, 0.2),
+        trophy(x + 28, y + (height - cup_h) / 2, scale, best["rank"], colors, ink)[0],
+        label(text_mid, y + height / 2 - 2, best["title"], colors["fg"], 16, 0.3, "middle"),
+        label(text_mid, y + height / 2 + 18, f"{best['score']:,}", colors["muted"], 13, 0.2, "middle"),
         "</svg>",
     ])
 
@@ -101,7 +120,7 @@ def _regular(mode, colors, data, rows):
         open_svg(mode, 495, 192, f"{data['login']} trophies"),
         name,
         label(475, 30, f"@{data['login']}", colors["muted"], 12, 0.2, "end"),
-        _plates(16, 48, 463, 128, rows, colors, 2.2, mode),
+        _plates(16, 48, 463, 128, rows, colors, mode),
         "</svg>",
     ])
 
@@ -111,7 +130,7 @@ def _wide(mode, colors, data):
     return "\n".join([
         open_svg(mode, 896, 248, f"{data['login']} trophies"),
         name,
-        _plates(16, 48, 864, 184, data["rows"], colors, 2.2, mode),
+        _plates(16, 48, 864, 184, data["rows"], colors, mode),
         "</svg>",
     ])
 
@@ -136,7 +155,7 @@ def main():
     lines = [
         f"# {data['login']}",
         "",
-        "Compact is the best rank. Regular is the top three. Wide is the six-rank row. Extra letters share the center baseline, and the rim steps down over them.",
+        "Compact is the best rank. Regular is the top three. Wide is the six-rank row. The trophy is a glass disc held by two arms on a flat base. The category and the score are centered under it.",
         "",
     ]
     for mode in MODES:
